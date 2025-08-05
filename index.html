@@ -94,20 +94,15 @@
         </div>`;
     });
 
-    html += `</div>`;
+    html += `</div></div>`;
 
-    html += `</div>`; // end of menuGrid
-
-// เพิ่มประกาศเตือน
-html += `
-  <div class="mt-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 text-sm rounded">
-    <p>
-      เรารับแค่การจ่ายผ่าน <strong>PromptPay</strong> เท่านั้น เพื่อหลีกเลี่ยงการโดนหลอก และเพื่อความรวดเร็วในการส่งสินค้า<br />
-      ขอบคุณที่เข้าใจ ด้วยความภักดีจาก <strong>Wonder</strong>
-    </p>
-  </div>
-`;
-
+    html += `
+      <div class="mt-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 text-sm rounded">
+        <p>
+          รับการจ่ายผ่าน <strong>PromptPay</strong> เท่านั้น เพื่อหลีกเลี่ยงการโดนหลอก และเพื่อความรวดเร็วในการส่งสินค้า<br />
+          ขอบคุณที่เข้าใจ ด้วยความภักดีจาก <strong>Wonder</strong>
+        </p>
+      </div>`;
 
     contentDiv.innerHTML = html;
 
@@ -196,6 +191,7 @@ html += `
       <div class="mt-4 text-center no-download">
         <p class="font-bold mb-2">สแกนเพื่อชำระเงินผ่าน PromptPay</p>
         <img src="${qrUrl}" alt="QR PromptPay" class="mx-auto w-[250px] border p-2 bg-white rounded" />
+        <p class="text-red-600 mt-2 text-sm font-medium">หลังชำระเงินแล้ว กรุณาส่งใบสั่งซื้อและสลิปในแชทไลน์</p>
       </div>`;
     html += `</div>`;
     html += `
