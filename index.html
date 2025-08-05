@@ -42,7 +42,7 @@
       { id: 5, name: "คารามูโจ้ 40 ก.", price: 20.50, originalPrice: 24.00, img: "6.png" },
       { id: 6, name: "ข้าวโพดอบกรอบรสนม 38 ก.", price: 5.33, originalPrice: 6.00, img: "9.png" },
       { id: 7, name: "คาราด้า 52 ก.", price: 16.67, originalPrice: 20.00, img: "4.png" },
-      { id: 8, name: "ตะวัน รสต้นตำรับ 67 ก.", price: 16.67, originalPrice: 22.00, img: "7.png" },
+      { id: 8, name: "ตะวัน รสต้นตำรับ 67 ก.", price: 16.67, originalPrice: 20.00, img: "7.png" },
       { id: 9, name: "ทวิสโก้ 68 ก.", price: 16.67, originalPrice: 20.00, img: "8.png" },
     ],
   };
@@ -95,6 +95,20 @@
     });
 
     html += `</div>`;
+
+    html += `</div>`; // end of menuGrid
+
+// เพิ่มประกาศเตือน
+html += `
+  <div class="mt-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 text-sm rounded">
+    <p>
+      เรารับแค่การจ่ายผ่าน <strong>PromptPay</strong> เท่านั้น เพื่อหลีกเลี่ยงการโดนหลอก และเพื่อความรวดเร็วในการส่งสินค้า<br />
+      ขอบคุณที่เข้าใจ ด้วยความภักดีจาก <strong>Wonder</strong>
+    </p>
+  </div>
+`;
+
+
     contentDiv.innerHTML = html;
 
     document.querySelectorAll(".add-btn").forEach((btn) => {
