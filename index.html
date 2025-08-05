@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WonderDeliveryทิพวัล</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Kanit', sans-serif;
+    }
+    @media (max-width: 768px) {
+      .cart-fixed {
+        position: static !important;
+        width: 100% !important;
+        margin-bottom: 1rem;
+        max-height: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-4">
+  <div class="max-w-5xl mx-auto bg-white p-6 rounded shadow">
+    <nav class="mb-6 text-gray-600 text-sm flex flex-wrap items-center space-x-2">
+      <span class="step cursor-pointer" data-step="2">เมนู</span> &rarr;
+      <span class="step cursor-pointer" data-step="5">ดาวน์โหลดใบสั่งซื้อ</span>
+    </nav>
+
+    <div id="content"></div>
+  </div>
+
+<script>
+  const selectedStore = {
+    name: "WonderDeliveryทิพวัล",
+    menu: [
+      { id: 1, name: "น้ำคริสตัล 1.5 ลิตร", price: 8.17, originalPrice: 14.00, img: "2.png" },
+      { id: 2, name: "เป๊บซี่ 640 มล.", price: 16.58, originalPrice: 19.00, img: "1.png" },
+      { id: 3, name: "เลย์ร็อคเหลือ 48 ก.", price: 17.17, originalPrice: 20.00, img: "5.png" },
+      { id: 4, name: "เลย์รสซาวครีม 48 ก.", price: 17.17, originalPrice: 20.00, img: "3.png" },
+      { id: 5, name: "คารามูโจ้ 40 ก.", price: 20.50, originalPrice: 24.00, img: "6.png" },
+      { id: 6, name: "ข้าวโพดอบกรอบรสนม 38 ก.", price: 5.33, originalPrice: 6.00, img: "9.png" },
+      { id: 7, name: "คาราด้า 52 ก.", price: 16.67, originalPrice: 20.00, img: "4.png" },
+      { id: 8, name: "ตะวัน รสต้นตำรับ 67 ก.", price: 16.67, originalPrice: 22.00, img: "7.png" },
+      { id: 9, name: "ทวิสโก้ 68 ก.", price: 16.67, originalPrice: 20.00, img: "8.png" },
+    ],
+  };
+
+  let currentStep = 2;
+  let cart = [];
+  const deliveryFee = 35;
+  const contentDiv = document.getElementById("content");
+
+  function updateBreadcrumb() {
+    document.querySelectorAll(".step").forEach((span) => {
+      const step = Number(span.dataset.step);
+      span.classList.toggle("font-bold", step === currentStep);
+      span.classList.toggle("text-blue-600", step === currentStep);
+    });
+  }
+
+  function renderMenu() {
+    let html = `
+      <h2 class="text-xl font-semibold mb-4">เมนู</h2>
+      <input type="text" id="searchInput" placeholder="ค้นหาสินค้า..." class="mb-4 w-full p-2 border rounded" />
+
+      <details class="cart-fixed border-2 border-red-500 rounded p-4 bg-white mb-4" open>
+        <summary class="font-bold text-lg cursor-pointer text-red-600">🛒 ตะกร้า</summary>
+        <div id="cartItems" class="mt-3 mb-3"></div>
+        <div class="flex justify-between font-bold mb-2">
+          <span>ค่าส่ง</span><span>${deliveryFee} ฿</span>
+        </div>
+        <div class="flex justify-between font-bold text-xl" id="cartTotalDiv">
+          <span>รวมทั้งหมด</span><span>0 ฿</span>
+        </div>
+        <button id="goToReceipt" class="mt-4 w-full bg-blue-600 text-white py-2 rounded" ${cart.length === 0 ? "disabled" : ""}>
+          ดูใบสั่งซื้อ
+        </button>
+      </details>
+
+      <div class="grid grid-cols-2 gap-4 mt-4" id="menuGrid">`;
+
+    selectedStore.menu.forEach((item) => {
+      html += `
+        <div class="bg-gray-50 p-4 rounded shadow menu-item" data-name="${item.name.toLowerCase()}">
+          <img src="${item.img}" alt="${item.name}" class="w-full h-[300px] object-cover rounded mb-2" />
+          <h3 class="font-bold">${item.name}</h3>
+          <p>
+            <span class="text-sm text-red-500 line-through mr-1">${item.originalPrice?.toFixed(2)} ฿</span>
+            <span class="font-bold">${item.price} ฿</span>
+          </p>
+          <button class="mt-2 bg-green-500 text-white px-3 py-1 rounded add-btn" data-id="${item.id}">เพิ่มลงตะกร้า</button>
+        </div>`;
+    });
+
+    html += `</div>`;
+    contentDiv.innerHTML = html;
+
+    document.querySelectorAll(".add-btn").forEach((btn) => {
+      btn.onclick = () => {
+        const id = Number(btn.dataset.id);
+        const item = selectedStore.menu.find((i) => i.id === id);
+        const exist = cart.find((i) => i.id === id);
+        if (exist) {
+          exist.qty++;
+        } else {
+          cart.push({ ...item, qty: 1 });
+        }
+        renderMenu();
+      };
+    });
+
+    function renderCartItems() {
+      const cartDiv = document.getElementById("cartItems");
+      cartDiv.innerHTML = "";
+      cart.forEach((item) => {
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "flex justify-between items-center mb-2";
+        itemDiv.innerHTML = `
+          <div>${item.name} x${item.qty}</div>
+          <div class="flex items-center space-x-2">
+            <button class="bg-red-500 text-white px-2 rounded" data-action="minus" data-id="${item.id}">-</button>
+            <button class="bg-green-500 text-white px-2 rounded" data-action="plus" data-id="${item.id}">+</button>
+            <span>${(item.price * item.qty).toFixed(2)} ฿</span>
+          </div>`;
+        cartDiv.appendChild(itemDiv);
+      });
+
+      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+      const totalDiv = document.getElementById("cartTotalDiv");
+      totalDiv.querySelector("span:last-child").textContent = (total + deliveryFee).toFixed(2) + " ฿";
+
+      document.getElementById("goToReceipt").disabled = cart.length === 0;
+    }
+
+    renderCartItems();
+
+    document.querySelectorAll("#cartItems button").forEach((btn) => {
+      btn.onclick = () => {
+        const id = Number(btn.dataset.id);
+        const action = btn.dataset.action;
+        const item = cart.find(i => i.id === id);
+        if (!item) return;
+        if (action === "plus") item.qty++;
+        else if (action === "minus") {
+          item.qty--;
+          if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+        }
+        renderMenu();
+      };
+    });
+
+    document.getElementById("goToReceipt").onclick = () => {
+      currentStep = 5;
+      renderStep();
+    };
+
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll(".menu-item").forEach((el) => {
+        const name = el.dataset.name;
+        el.style.display = name.includes(term) ? "block" : "none";
+      });
+    });
+  }
+
+  function renderReceipt() {
+    const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+    const grandTotal = total + deliveryFee;
+    const phone = "0957867303";
+    const qrUrl = `https://promptpay.io/${phone}/${grandTotal.toFixed(2)}.png`;
+
+    let html = `<h2 class="text-xl font-semibold mb-4">ใบสั่งซื้อ</h2>`;
+    html += `<div id="receiptContent" class="p-4 border rounded bg-gray-50">`;
+    cart.forEach((item) => {
+      html += `<div class="flex justify-between mb-2">${item.name} x${item.qty}<span>${(item.price * item.qty).toFixed(2)} ฿</span></div>`;
+    });
+    html += `<hr class="my-4"><div class="flex justify-between font-bold mb-2">ค่าส่ง<span>${deliveryFee} ฿</span></div>`;
+    html += `<div class="flex justify-between font-bold mb-2">รวมทั้งหมด<span>${grandTotal.toFixed(2)} ฿</span></div>`;
+    html += `
+      <div class="mt-4 text-center no-download">
+        <p class="font-bold mb-2">สแกนเพื่อชำระเงินผ่าน PromptPay</p>
+        <img src="${qrUrl}" alt="QR PromptPay" class="mx-auto w-[250px] border p-2 bg-white rounded" />
+      </div>`;
+    html += `</div>`;
+    html += `
+      <div class="mt-4 flex justify-between">
+        <button id="backToMenu" class="px-4 py-2 bg-gray-300 rounded">กลับไปเมนู</button>
+        <button id="downloadBtn" class="px-4 py-2 bg-green-600 text-white rounded">ดาวน์โหลดใบสั่งซื้อ (ภาพ)</button>
+      </div>`;
+    contentDiv.innerHTML = html;
+
+    document.getElementById("backToMenu").onclick = () => {
+      currentStep = 2;
+      renderStep();
+    };
+
+    document.getElementById("downloadBtn").onclick = () => {
+      const qrDiv = document.querySelector(".no-download");
+      if (qrDiv) qrDiv.style.display = "none";
+
+      const receiptElement = document.getElementById("receiptContent");
+      html2canvas(receiptElement).then((canvas) => {
+        const link = document.createElement("a");
+        link.download = "receipt.png";
+        link.href = canvas.toDataURL();
+        link.click();
+
+        if (qrDiv) qrDiv.style.display = "block";
+      });
+    };
+  }
+
+  function renderStep() {
+    updateBreadcrumb();
+    if (currentStep === 5) renderReceipt();
+    else renderMenu();
+  }
+
+  renderStep();
+
+  document.querySelectorAll(".step").forEach((span) => {
+    span.addEventListener("click", () => {
+      const step = Number(span.dataset.step);
+      if (step <= currentStep) {
+        currentStep = step;
+        renderStep();
+      }
+    });
+  });
+</script>
+</body>
+</html>
